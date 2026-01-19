@@ -45,6 +45,7 @@ if [[ -d "$DEST_DIR/.git" ]]; then
   echo "Workshop_Computer already present: $DEST_DIR"
   rewrite_github_ssh_submodules_to_https "$DEST_DIR"
   git -C "$DEST_DIR" submodule update --init --recursive >/dev/null 2>&1 || true
+  git config --global --add safe.directory "$DEST_DIR" >/dev/null 2>&1 || true
   exit 0
 fi
 
@@ -76,5 +77,7 @@ fi
 rewrite_github_ssh_submodules_to_https "$DEST_DIR"
 
 git -C "$DEST_DIR" submodule update --init --recursive >/dev/null 2>&1 || true
+
+git config --global --add safe.directory "$DEST_DIR" >/dev/null 2>&1 || true
 
 echo "Workshop_Computer clone complete."
