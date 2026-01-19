@@ -8,6 +8,8 @@ The goals are:
 - Support building example and release card projects **without modifying upstream repos**.
 - Provide a straightforward workflow for **making your own card** and submitting it upstream.
 
+Huge thank you to Chris Johnson for creating the ComputerCard framework!
+
 ## Intended workflow (make your own card)
 
 1. Fork/clone this dev environment repo.
