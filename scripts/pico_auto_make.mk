@@ -192,6 +192,7 @@ flash: uf2
 	    echo "FLASH OK"; \
 	  else \
 	    echo "FLASH FAILED (gdb exit $$rc)"; \
+	    echo "Hint: if this fails intermittently, try running 'make flash' again."; \
 	  fi; \
 	  exit $$rc
 
