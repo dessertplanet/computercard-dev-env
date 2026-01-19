@@ -1,19 +1,5 @@
 {
   "version": "0.2.0",
-  "inputs": [
-    {
-      "id": "picoProjectDir",
-      "type": "promptString",
-      "description": "Project directory (relative to workspace) to debug",
-      "default": "XX_newcard"
-    },
-    {
-      "id": "picoElfPath",
-      "type": "promptString",
-      "description": "ELF to debug (path relative to workspace)",
-      "default": "XX_newcard/build/passthru.elf"
-    }
-  ],
   "configurations": [
     {
       "name": "Workshop Computer",
