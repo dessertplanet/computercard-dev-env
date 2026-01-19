@@ -1,5 +1,5 @@
 {
-  "name": "ComputerCard Dev",
+  "name": "ComputerCard",
   "build": {
     "dockerfile": "Dockerfile",
     "args": {
@@ -8,6 +8,7 @@
   },
   "workspaceFolder": "/workspaces/computercard-dev-env",
   "runArgs": ["--add-host=host.docker.internal:host-gateway"],
+  "onCreateCommand": "bash /workspaces/computercard-dev-env/scripts/bootstrap_workshop_computer.sh",
   "remoteEnv": {
     "PICO_SDK_PATH": "/opt/pico-sdk",
     "MAKEFILES": "/workspaces/computercard-dev-env/scripts/pico_auto_make.mk"

@@ -27,7 +27,7 @@ These instructions are for edits in this repo.
   - It provides `make`, `make .`, `make uf2`, and `make flash` in Pico SDK CMake project folders that have no local Makefile.
 - **Flashing uses host-side OpenOCD**.
   - Inside container: `make flash` connects to `host.docker.internal:3333` by default.
-  - Host wrappers: `scripts/start_openocd_host.sh` and `scripts/start_openocd_host.ps1` start OpenOCD on the host.
+  - Host wrappers: `start_openocd_host.sh` and `start_openocd_host.ps1` start OpenOCD on the host.
   - `flash` selects which ELF to load based on the newest `UF2/*.uf2` (OpenOCD/GDB loads ELF; UF2 is used for selection).
 
 ## Make commands (dev env)
