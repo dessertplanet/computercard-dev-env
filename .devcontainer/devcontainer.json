@@ -1,5 +1,5 @@
 {
-  "name": "ComputerCard Pico Dev",
+  "name": "ComputerCard Dev",
   "build": {
     "dockerfile": "Dockerfile",
     "args": {

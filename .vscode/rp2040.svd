@@ -1,7 +1,0 @@
-<!--
-Deprecated placeholder.
-
-This repo no longer references an SVD by default.
-If you want peripheral register views in Cortex-Debug, add an SVD and set "svdFile"
-in .vscode/launch.json.
--->
