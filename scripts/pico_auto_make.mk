@@ -71,7 +71,10 @@ else
 endif
 
 CMAKE_ARGS ?=
-CMAKE_ARGS += -DCMAKE_EXPORT_COMPILE_COMMANDS=ON $(CMAKE_PICO_SDK_ARGS)
+PICO_BOARD_HEADER_DIRS ?= $(abspath $(PICO_PROJECT_DIR));$(abspath $(PICO_PROJECT_DIR)/..);/workspaces/computercard-dev-env/boards
+
+CMAKE_ARGS += -DCMAKE_EXPORT_COMPILE_COMMANDS=ON $(CMAKE_PICO_SDK_ARGS) \
+	-DPICO_BOARD_HEADER_DIRS="$(PICO_BOARD_HEADER_DIRS)"
 
 NINJA := $(shell command -v ninja 2>/dev/null)
 ifneq ($(strip $(NINJA)),)
