@@ -1,0 +1,15 @@
+*~
+\#*
+build
+.DS_Store
+
+# In-source CMake build artifacts (avoid; prefer out-of-source builds in build/)
+CMakeCache.txt
+CMakeFiles/
+cmake_install.cmake
+Makefile
+_deps/
+generated/
+pico-sdk/
+pioasm/
+pioasm-install/

@@ -1,0 +1,528 @@
+<!DOCTYPE html>
+<html>
+  <head>
+  <meta charset="UTF-8">      
+  <title>Sample upload</title>
+  <script src="wav.js"></script>
+    <style>
+	  body {
+		  font-family: sans-serif;
+	  }
+	  h1 {margin-bottom: 0.25em;}
+	  h2 {margin-top: 3em;}
+        .drop-zone {
+            border: 1px solid #bbb;
+            background-color: #F8F8F8;
+			padding: 20px;
+            text-align: center;
+            margin: 40px 0;
+			box-shadow: inset 2px 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .drop-zone.dragover {
+            border-color: #000;
+            background-color: #f0f0f0;
+        }
+
+        #fileList {
+            list-style: none;
+            padding: 0;
+        }
+
+        #fileList li {
+            padding: 2px 10px;
+            margin: 3px 0;
+            background: #f8f8f8;
+            border: 1px solid #ddd;
+            cursor: move;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        #fileList li.dragging {
+            opacity: 0.5;
+        }
+
+        button {
+            padding: 5px 10px;
+            margin: 5px;
+            cursor: pointer;
+        }
+
+		#dlbutton {padding:15px; margin:15px; font-size: 15px; }
+        .delete-btn {
+            background: #ff4444;
+            color: white;
+            border: none;
+            padding: 1px 4px;
+			margin: 1px;
+            margin-left: 10px;
+			
+			aspect-ratio: 1 / 1;
+        }
+		.play-btn {
+            background: #4444ff;
+            color: white;
+            border: none;
+            padding: 1px 4px;
+			margin: 1px;
+            margin-left: 10px;
+			aspect-ratio: 1 / 1;
+        }
+		.file-size {
+            color: #666;
+            font-size: 0.9em;
+            margin-left: 10px;
+        }
+
+        #sizeError {
+            color: #ff4444;
+            font-weight: bold;
+            margin: 10px 0;
+            display: none;
+        }
+
+        #totalSize {
+            margin: 10px 0;
+            font-weight: bold;
+        }
+
+
+
+		.switch {
+			position: relative;
+			display: inline-block;
+			width: 50px;
+			height: 24px;
+		}
+
+		.switch input {
+			opacity: 0;
+			width: 0;
+			height: 0;
+		}
+
+		.slider {
+			position: absolute;
+			cursor: pointer;
+			top: 0;
+			left: 0;
+			right: 0;
+			bottom: 0;
+			background-color: #aaa;
+			transition: .1s;
+			border-radius: 12px;
+			box-shadow: inset 1px 1px 4px rgba(0,0,0,0.4);
+		}
+
+		.slider:before {
+			position: absolute;
+			content: "";
+			height: 18px;
+			width: 18px;
+			left: 4px;
+			bottom: 3px;
+			background-color: white;
+			transition: .1s;
+			border-radius: 50%;
+			box-shadow: 1px 1px 4px rgba(0,0,0,0.4);
+		}
+
+		input:checked + .slider {
+			background-color: #aaa;
+		}
+
+		input:checked + .slider:before {
+			transform: translateX(24px);
+		}
+
+		.switch-container {
+			display: flex;
+			justify-content: flex-start;
+			align-items:center;
+			gap: 5px;
+		}
+
+		.option {
+			font-family: sans-serif;
+			font-weight: bold;
+			font-size: 14px;
+		}
+
+
+    </style>
+</head>
+<body>
+  <div style="max-width:800px; margin: 20px auto;">
+	<h1>WAV-to-UF2 converter</h1>
+	<div>for the Music Thing Modular Workshop System Computer</div>
+	<h2>Step 1: Select the size of the program card</h2>
+	<div class="switch-container">
+	  <div>Program card size:   </div>
+      <div class="option">2MB</div>
+	  <label class="switch">
+		<input type="checkbox" id="memorySwitch">
+		<span class="slider"></span>
+	  </label>
+      <div class="option">16MB</div>
+	</div>
+	
+	<h2>Step 2: Select your samples</h2>
+	<p>Samples must be in WAV format, 16-bit mono uncompressed.</p>
+	<div class="drop-zone" id="dropZone">
+      Drag and drop WAV file(s) here, or<br>
+      <button onclick="document.getElementById('fileInput').click()">Select file(s)</button>
+	</div>
+	<input type="file" id="fileInput" accept=".wav" multiple style="display: none;">
+	<ul id="fileList"></ul>
+	<div id="totalSize"></div>
+	<div id="sizeError">Total file size exceeds maximum</div>
+	
+	<h2>Step 3: Convert your samples to a UF2 file</h2>
+	<button onclick="combineFiles()" id="dlbutton" disabled>Combine and download UF2</button>
+	<p>Upload the UF2 file generated here over USB to a program card running the <code>sample_upload</code> program. Uploading will replace any audio samples currently stored on this card, but will not replace the <code>sample_upload</code> program itself.
+  </div>
+  <script>
+
+	 /************************************************************/
+	 // Values that are likely to change in any non-example usage
+
+	 // Size of firmware
+	 //
+	 // - Here listed as 200KB , somewhat conservative for a ~80KB firmware
+	 // - Make this at least 4KB bigger than the size of the firmware executable,
+	 //   due to UF2 alignment requirements.
+	 // - To find firmware size:
+	 // -- add "-Wl,--print-memory-usage" flags to GCC when linking to report
+	 //    FLASH used size during compilation
+	 // -- or look at the size of the ".bin" file produced during compilation
+	 // - Obviously, firmwares with custom linker scripts (or which themselves
+	 //   write to flash) have more complicated 
+	 const FIRMWARE_SIZE = 200*1024; 
+
+	 // Permitted WAV file formats that the firmware supports. In this demo, just mono 16-bit PCM.
+	 // A more sophisticated implementation would convert WAV files into the desired format, using
+	 // e.g. https://github.com/rochars/wavefile
+	 function validWavFormat(wavFile)
+	 {
+		 // 'compression' = 1 means PCM format
+		 return (wavFile.numChannels == 1 && wavFile.bitsPerSample == 16 && wavFile.compression == 1);
+	 }
+
+	 /************************************************************/
+	 
+	 
+
+	 // UF2 file constants
+	 const RP2040_START_OF_FLASH = 0x10000000;
+	 const UF2_BLOCK_SIZE = 512;
+	 const UF2_DATA_SIZE = 256;
+	 const UF2_MAGIC_START0 = 0x0A324655; // "UF2\n"
+	 const UF2_MAGIC_START1 = 0x9E5D5157;
+	 const UF2_MAGIC_END = 0x0AB16F30;
+	 const RP2040_FAMILY_ID = 0xE48BFF56;
+
+	 
+	 var flashSize, maxAudioDataSize;
+
+     const dropZone = document.getElementById('dropZone');
+     const fileInput = document.getElementById('fileInput');
+     const fileList = document.getElementById('fileList');
+	 const dlbutton = document.getElementById('dlbutton');
+     const sizeError = document.getElementById('sizeError');
+     const totalSizeElement = document.getElementById('totalSize');
+	 const memorySwitch = document.getElementById('memorySwitch');
+
+     let draggedItem = null;
+	 
+     // Handle file selection
+     fileInput.addEventListener('change', handleFiles);
+     
+     // Drag and drop handlers
+     dropZone.addEventListener('dragover', e => {
+         e.preventDefault();
+         dropZone.classList.add('dragover');
+     });
+
+     dropZone.addEventListener('dragleave', e => {
+         dropZone.classList.remove('dragover');
+     });
+
+     dropZone.addEventListener('drop', e => {
+         e.preventDefault();
+         dropZone.classList.remove('dragover');
+         handleFiles(e.dataTransfer);
+     });
+
+     // File list drag and drop
+     fileList.addEventListener('dragstart', e => {
+         draggedItem = e.target.closest('li');
+         draggedItem.classList.add('dragging');
+     });
+
+     fileList.addEventListener('dragover', e => {
+         e.preventDefault();
+         const afterElement = getDragAfterElement(fileList, e.clientY);
+         if (draggedItem) {
+             if (afterElement == null) {
+                 fileList.appendChild(draggedItem);
+             } else {
+                 fileList.insertBefore(draggedItem, afterElement);
+             }
+         }
+     });
+
+     fileList.addEventListener('dragend', e => {
+         draggedItem.classList.remove('dragging');
+         draggedItem = null;
+     });
+
+	 // Update size display and download button 
+     function updateTotalSize() {
+		 updateFlashSize(); // make sure we have right flash size
+		 
+         const files = Array.from(fileList.children).map(li => li.file);
+         const totalBytes = files.reduce((sum, file) => sum + file.size, 0);
+         
+         totalSizeElement.textContent = `Used ${formatFileSize(totalBytes)} of ${formatFileSize(maxAudioDataSize)} (${(100*totalBytes/maxAudioDataSize).toFixed(0)}%)`;
+         
+         if (totalBytes > maxAudioDataSize) {
+             sizeError.style.display = 'block';
+         } else {
+             sizeError.style.display = 'none';
+         }
+		 dlbutton.disabled = (fileList.childElementCount == 0) || (totalBytes > maxAudioDataSize);
+     }
+	 
+	 window.onload = function()
+	 {
+		 dlbutton.disabled = true;
+		 updateTotalSize();
+	 }
+
+	 function updateFlashSize()
+	 {
+		 flashSize = memorySwitch.checked?16*1024*1024:2*1024*1024;
+		 maxAudioDataSize = flashSize - FIRMWARE_SIZE;
+	 }
+	 
+	 memorySwitch.addEventListener('change', function()
+								   {
+									   updateTotalSize();
+								   });
+	 
+     function handleFiles(dataTransfer) {
+         const files = dataTransfer.files || fileInput.files;
+         for (const file of files) {
+			 const reader = new FileReader();
+             reader.onload = () => {
+				 var wavFile = new wav(reader.result);
+				 var formatStr = wavFile.bitsPerSample+'-bit '+(wavFile.sampleRate/1000)+'kHz ';
+				 if (wavFile.numChannels==1)
+					 formatStr += 'mono';
+				 else if (wavFile.numChannels == 2)
+					 formatStr += 'stereo';
+				 
+				 if (validWavFormat(wavFile))
+				 {
+					 
+					 addFileToList(file, formatStr);
+				 }
+				 else
+				 {
+					 var fstr = wavFile.bitsPerSample+'-bit';
+					 
+					 if (wavFile.numChannels == 2)
+						 fstr += ' stereo';
+					 if (wavFile.compression != 1)
+						 fstr += ' and is compressed (not PCM)';
+					 alert(file.name+' is '+formatStr+', but this program only supports 16-bit mono PCM WAV files.');
+				 }
+			 }
+			 reader.readAsArrayBuffer(file);
+         }
+         fileInput.value = ''; // Reset input
+		 updateTotalSize();
+     }
+
+     function formatFileSize(bytes) {
+         if (bytes === 0) return '0 Bytes';
+         const k = 1024;
+         const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+         const i = Math.floor(Math.log(bytes) / Math.log(k));
+         return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+     }
+
+	 
+
+     function addFileToList(file, formatStr) {
+         const li = document.createElement('li');
+         li.draggable = true;
+         li.file = file;
+         
+         const fileInfo = document.createElement('div');
+         
+         const fileName = document.createElement('span');
+         fileName.textContent = file.name;
+         
+         const fileSize = document.createElement('span');
+         fileSize.className = 'file-size';
+         fileSize.textContent = formatFileSize(file.size);
+		 
+         const wavFileInfo = document.createElement('span');
+         wavFileInfo.className = 'file-size';
+         wavFileInfo.textContent = formatStr;
+
+         const deleteBtn = document.createElement('button');
+         deleteBtn.className = 'delete-btn';
+         deleteBtn.textContent = '✕';
+         deleteBtn.onclick = () => {
+             li.remove();
+             updateTotalSize();
+         };
+         
+
+		 
+         fileInfo.appendChild(fileName);
+         fileInfo.appendChild(fileSize);
+         fileInfo.appendChild(wavFileInfo);
+         li.appendChild(fileInfo);
+         li.appendChild(deleteBtn);
+         fileList.appendChild(li);
+         
+         updateTotalSize();
+     }
+
+
+     function getDragAfterElement(container, y) {
+         const draggableElements = [...container.querySelectorAll('li:not(.dragging)')];
+         
+         return draggableElements.reduce((closest, child) => {
+             const box = child.getBoundingClientRect();
+             const offset = y - box.top - box.height / 2;
+             if (offset < 0 && offset > closest.offset) {
+                 return { offset: offset, element: child };
+             } else {
+                 return closest;
+             }
+         }, { offset: Number.NEGATIVE_INFINITY }).element;
+     }
+
+     async function combineFiles() {
+         const files = Array.from(fileList.children).map(li => li.file);
+
+		 // re-check valid files
+         if (files.length === 0) {
+             alert('Please select files first!');
+             return;
+         }
+		 
+		 const totalBytes = files.reduce((sum, file) => sum + file.size, 0);
+         if (totalBytes > maxAudioDataSize) {
+             alert('Total file size exceeds maximum allowed limit');
+             return;
+         }
+		 
+         try {
+             const buffers = await Promise.all(files.map(file => 
+														 new Promise((resolve, reject) => {
+															 const reader = new FileReader();
+															 reader.onload = () => resolve(reader.result);
+															 reader.onerror = reject;
+															 reader.readAsArrayBuffer(file);
+														 })
+														));
+
+			 // Combine all buffers into one
+             let totalLength = buffers.reduce((acc, buf) => acc + buf.byteLength, 0);
+             let combined = new Uint8Array(totalLength);
+             let offset = 0;
+             buffers.forEach(buf => {
+                 combined.set(new Uint8Array(buf), offset);
+                 offset += buf.byteLength;
+             });
+
+
+			 // Calculate UF2 start address
+			 // Want to fit WAV file data, plus one empty 256-byte page, at the end of the flash
+			 let address = RP2040_START_OF_FLASH + flashSize - totalLength - UF2_DATA_SIZE;
+			 // While flash writing is on 256-byte pages, erasing is on 4k pages,
+			 // so best (and possibly required) to align UF2 with 4Kb page.
+			 address = address - (address % 4096);
+			 numBlocks = (RP2040_START_OF_FLASH + flashSize - address)/UF2_DATA_SIZE;
+			 numFiles = files.length;
+             // Convert to UF2 format
+             const uf2Array = convertToUF2(combined.buffer, address, numBlocks, numFiles);
+			 
+             const blob = new Blob([uf2Array], { type: 'application/octet-stream' });
+             const url = URL.createObjectURL(blob);
+             const a = document.createElement('a');
+             a.href = url;
+             a.download = 'samples.uf2';
+             document.body.appendChild(a);
+             a.click();
+             document.body.removeChild(a);
+             URL.revokeObjectURL(url);
+         } catch (error) {
+             alert('Error combining files: ' + error.message);
+         }
+     }
+
+     function convertToUF2(buffer, address, numBlocks, numFiles) {
+
+		 // Add one more block at the end to give 256 bytes for file start pointer(s)
+         const uf2Buffer = new ArrayBuffer(numBlocks * UF2_BLOCK_SIZE);
+         
+         
+         for (let blockIdx = 0; blockIdx < numBlocks; blockIdx++) {
+             const blockOffset = blockIdx * UF2_BLOCK_SIZE;
+             const dataOffset = blockIdx * UF2_DATA_SIZE;
+             const dataEnd = Math.min(dataOffset + UF2_DATA_SIZE, buffer.byteLength);
+             const dataLength = dataEnd - dataOffset;
+             
+             // Create DataView for this block
+             const blockView = new DataView(uf2Buffer, blockOffset, UF2_BLOCK_SIZE);
+             
+             // Set header values
+             blockView.setUint32(0, UF2_MAGIC_START0, true);
+             blockView.setUint32(4, UF2_MAGIC_START1, true);
+             blockView.setUint32(8, 0x2000, true); // Flags: family ID present
+             blockView.setUint32(12, address + dataOffset, true);
+			 console.log(address+dataOffset);
+             blockView.setUint32(16, UF2_DATA_SIZE, true);
+             blockView.setUint32(20, blockIdx, true);
+             blockView.setUint32(24, numBlocks, true);
+             blockView.setUint32(28, RP2040_FAMILY_ID, true);
+             blockView.setUint32(32, 0, true); // Reserved
+
+             // Copy data
+			 if (blockIdx < numBlocks - 1)
+			 {
+				 if (dataLength>0)
+				 {
+					 const targetData = new Uint8Array(uf2Buffer, blockOffset + 32, UF2_DATA_SIZE);
+					 const sourceData = new Uint8Array(buffer, dataOffset, dataLength);
+					 targetData.set(sourceData);
+				 }
+				 else
+				 {
+				 }
+             }
+			 else
+			 {
+				 // In the last block, 256 bytes before end of flash,
+				 // put the memory-mapped address of the start of the wav file data
+				 blockView.setUint32(32, address, true);
+				 // and the number of WAV files being uploaded
+				 blockView.setUint32(36, numFiles, true);
+			 }
+			 
+             blockView.setUint32(508, UF2_MAGIC_END, true);
+         }
+         console.log(uf2Buffer);
+         return uf2Buffer;
+     }
+    </script>
+</body>
+</html>
