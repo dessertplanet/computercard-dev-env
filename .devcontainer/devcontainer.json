@@ -7,12 +7,17 @@
     }
   },
   "workspaceFolder": "/workspaces/computercard-dev-env",
+  "runArgs": ["--add-host=host.docker.internal:host-gateway"],
   "remoteEnv": {
     "PICO_SDK_PATH": "/opt/pico-sdk",
     "MAKEFILES": "/workspaces/computercard-dev-env/scripts/pico_auto_make.mk"
   },
   "customizations": {
     "vscode": {
+      "extensions": [
+        "marus25.cortex-debug",
+        "ms-vscode.cpptools"
+      ],
       "settings": {
         "terminal.integrated.defaultProfile.linux": "bash"
       }

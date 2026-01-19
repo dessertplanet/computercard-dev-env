@@ -1,0 +1,42 @@
+{
+  "version": "0.2.0",
+  "inputs": [
+    {
+      "id": "picoProjectDir",
+      "type": "promptString",
+      "description": "Project directory (relative to workspace) to debug",
+      "default": "XX_newcard"
+    },
+    {
+      "id": "picoElfPath",
+      "type": "promptString",
+      "description": "ELF to debug (path relative to workspace)",
+      "default": "XX_newcard/build/passthru.elf"
+    }
+  ],
+  "configurations": [
+    {
+      "name": "Workshop Computer",
+      "type": "cortex-debug",
+      "request": "attach",
+      "cwd": "${workspaceFolder}/XX_newcard",
+
+      "servertype": "external",
+      "gdbTarget": "host.docker.internal:3333",
+
+      "gdbPath": "gdb-multiarch",
+      "executable": "${workspaceFolder}/XX_newcard/build/passthru.elf",
+
+      "preLaunchTask": "Pico: Build (XX_newcard)",
+
+      "runToEntryPoint": "main",
+      "postAttachCommands": [
+        "monitor reset init"
+      ],
+      "liveWatch": {
+        "enabled": true,
+        "samplesPerSecond": 4
+      }
+    }
+  ]
+}

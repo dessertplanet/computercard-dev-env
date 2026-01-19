@@ -10,6 +10,7 @@ RUN apt-get update \
         cmake \
         ninja-build \
         build-essential \
+        gdb-multiarch \
         python3 \
         python3-pip \
         pkg-config \

@@ -114,11 +114,94 @@ uf2: build
 	@find "$(BUILD_DIR)" -maxdepth 3 -type f -name '*.uf2' -print 2>/dev/null || true
 	@find . -maxdepth 3 -type f -name '*.uf2' -print 2>/dev/null || true
 
+# Flash via a running OpenOCD instance (typically on the host).
+#
+# Default expects OpenOCD is already running and listening for GDB on 3333:
+#   openocd -f interface/cmsis-dap.cfg -f target/rp2040.cfg -c "adapter speed 5000"
+#
+# If you run OpenOCD elsewhere, override:
+#   make flash OPENOCD_HOST=... OPENOCD_GDB_PORT=3333
+
+OPENOCD_HOST ?= host.docker.internal
+OPENOCD_GDB_PORT ?= 3333
+
+# Optional: explicitly choose an ELF to load.
+FLASH_ELF ?=
+
+# Optional: explicitly choose a UF2 (used to select which target to flash).
+# Note: OpenOCD/GDB flashes using an ELF, not a UF2.
+FLASH_UF2 ?=
+
+# GDB to use for flashing. If empty, auto-detect.
+GDB ?=
+
+
+.PHONY: flash
+
+flash: uf2
+	@set -uo pipefail; \
+	  fail() { echo "FLASH FAILED: $$*"; exit 2; }; \
+	  uf2="$(FLASH_UF2)"; \
+	  if [[ -z "$$uf2" && -d "UF2" ]]; then \
+	    uf2="$$(find "UF2" -maxdepth 1 -type f -name '*.uf2' -printf '%T@ %p\n' 2>/dev/null | sort -nr | head -n 1 | cut -d' ' -f2-)"; \
+	  fi; \
+	  if [[ -z "$$uf2" ]]; then \
+	    uf2="$$(find "$(BUILD_DIR)" -maxdepth 4 -type f -name '*.uf2' -printf '%T@ %p\n' 2>/dev/null | sort -nr | head -n 1 | cut -d' ' -f2-)"; \
+	  fi; \
+	  stem=""; \
+	  if [[ -n "$$uf2" ]]; then \
+	    stem="$$(basename "$$uf2" .uf2)"; \
+	  fi; \
+	  elf="$(FLASH_ELF)"; \
+	  if [[ -z "$$elf" && -n "$$stem" && -f "$(BUILD_DIR)/$$stem.elf" ]]; then \
+	    elf="$(BUILD_DIR)/$$stem.elf"; \
+	  fi; \
+	  if [[ -z "$$elf" ]]; then \
+	    elf="$$(find "$(BUILD_DIR)" -maxdepth 4 -type f -name '*.elf' -printf '%T@ %p\n' 2>/dev/null | sort -nr | head -n 1 | cut -d' ' -f2-)"; \
+	  fi; \
+	  if [[ -z "$$elf" || ! -f "$$elf" ]]; then \
+	    fail "couldn't find an .elf under $(BUILD_DIR) (set FLASH_ELF=... or ensure build produced one)"; \
+	  fi; \
+	  if [[ -n "$$uf2" ]]; then \
+	    echo "Using UF2 $$uf2 (selects ELF $$elf)"; \
+	  fi; \
+	  if ! (echo >"/dev/tcp/$(OPENOCD_HOST)/$(OPENOCD_GDB_PORT)") >/dev/null 2>&1; then \
+	    echo "Start OpenOCD on the host, e.g.:" >&2; \
+	    echo "  openocd -f interface/cmsis-dap.cfg -f target/rp2040.cfg -c \"adapter speed 5000\"" >&2; \
+	    fail "cannot connect to OpenOCD GDB server at $(OPENOCD_HOST):$(OPENOCD_GDB_PORT)"; \
+	  fi; \
+	  gdb_cmd="$(GDB)"; \
+	  if [[ -z "$$gdb_cmd" ]]; then \
+	    if command -v arm-none-eabi-gdb >/dev/null 2>&1; then gdb_cmd="arm-none-eabi-gdb"; \
+	    elif command -v gdb-multiarch >/dev/null 2>&1; then gdb_cmd="gdb-multiarch"; \
+	    else \
+	      echo "Install a GDB in the devcontainer (recommended: gdb-multiarch)." >&2; \
+	      fail "no suitable GDB found in PATH (arm-none-eabi-gdb or gdb-multiarch)"; \
+	    fi; \
+	  fi; \
+	  echo "Flashing $$elf via OpenOCD at $(OPENOCD_HOST):$(OPENOCD_GDB_PORT)"; \
+	  rc=0; \
+	  "$$gdb_cmd" -q -nx -batch \
+	    -ex "target extended-remote $(OPENOCD_HOST):$(OPENOCD_GDB_PORT)" \
+	    -ex "monitor reset init" \
+	    -ex "load" \
+	    -ex "monitor reset run" \
+	    -ex "detach" \
+	    "$$elf" || rc=$$?; \
+	  if [[ $$rc -eq 0 ]]; then \
+	    echo "FLASH OK"; \
+	  else \
+	    echo "FLASH FAILED (gdb exit $$rc)"; \
+	  fi; \
+	  exit $$rc
+
 help:
 	@echo "PicoSDK helper (auto-enabled when no Makefile exists)"
-	@echo "Targets: build (default), clean, uf2"
+	@echo "Targets: build (default), clean, uf2, flash"
 	@echo "Vars: BUILD_DIR=build CMAKE=cmake PICO_SDK_PATH=/path/to/pico-sdk"
 	@echo "      PICO_SDK_FETCH_FROM_GIT=ON PICO_SDK_FETCH_FROM_GIT_PATH=\$$HOME/.pico-sdk"
+	@echo "      OPENOCD_HOST=host.docker.internal OPENOCD_GDB_PORT=3333 GDB=gdb-multiarch"
+	@echo "      FLASH_ELF=path/to.elf FLASH_UF2=UF2/name.uf2"
 
 endif # PICO_IS_PICO_SDK
 endif # no local makefile

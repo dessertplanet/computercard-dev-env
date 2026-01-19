@@ -1,0 +1,33 @@
+{
+  "version": "2.0.0",
+  "inputs": [
+    {
+      "id": "picoProjectDir",
+      "type": "promptString",
+      "description": "Project directory to build (relative to workspace, e.g. XX_newcard or Workshop_Computer/releases/22_sheep)",
+      "default": "XX_newcard"
+    }
+  ],
+  "tasks": [
+    {
+      "label": "Pico: Build (XX_newcard)",
+      "type": "shell",
+      "command": "make",
+      "args": ["build"],
+      "options": {
+        "cwd": "${workspaceFolder}/XX_newcard"
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "Pico: Build (make build)",
+      "type": "shell",
+      "command": "make",
+      "args": ["build"],
+      "options": {
+        "cwd": "${workspaceFolder}/${input:picoProjectDir}"
+      },
+      "problemMatcher": []
+    }
+  ]
+}
