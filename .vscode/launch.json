@@ -5,13 +5,13 @@
       "name": "Workshop Computer",
       "type": "cortex-debug",
       "request": "attach",
-      "cwd": "${workspaceFolder}/XX_newcard",
+      "cwd": "${fileDirname}",
 
       "servertype": "external",
       "gdbTarget": "host.docker.internal:3333",
 
       "gdbPath": "gdb-multiarch",
-      "executable": "${workspaceFolder}/XX_newcard/build/passthru.elf",
+      "executable": "${fileDirname}/build/.last.elf",
 
       "preLaunchTask": "ComputerCard: make UF2",
 

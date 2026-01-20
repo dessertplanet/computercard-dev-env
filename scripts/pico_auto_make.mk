@@ -134,6 +134,11 @@ build:
 	      dest="$$rel/UF2/$$(basename "$$f")"; \
 	      echo "UF2 copied to $$dest"; \
 	    done < <(find "$(BUILD_DIR)" -maxdepth 4 -type f -name '*.uf2' -print0 2>/dev/null); \
+	    build_abs="$$(cd "$(BUILD_DIR)" && pwd)"; \
+	    last_elf="$$(find "$$build_abs" -maxdepth 4 -type f -name '*.elf' -printf '%T@ %p\n' 2>/dev/null | sort -nr | head -n 1 | cut -d' ' -f2-)"; \
+	    if [[ -n "$$last_elf" ]]; then \
+	      ln -sf "$$last_elf" "$(BUILD_DIR)/.last.elf"; \
+	    fi; \
 	    if [[ $$found -eq 0 ]]; then \
 	      true; \
 	    fi; \
@@ -193,6 +198,9 @@ flash: uf2
 	    stem="$$(basename "$$uf2" .uf2)"; \
 	  fi; \
 	  elf="$(FLASH_ELF)"; \
+	  if [[ -z "$$elf" && -f "$(BUILD_DIR)/.last.elf" ]]; then \
+	    elf="$(BUILD_DIR)/.last.elf"; \
+	  fi; \
 	  if [[ -z "$$elf" && -n "$$stem" && -f "$(BUILD_DIR)/$$stem.elf" ]]; then \
 	    elf="$(BUILD_DIR)/$$stem.elf"; \
 	  fi; \
