@@ -48,6 +48,7 @@ ifeq ($(PICO_IS_PICO_SDK),yes)
 
 CMAKE ?= cmake
 BUILD_DIR ?= build
+CMAKE_CXX_STANDARD ?= 17
 
 # Pico SDK resolution:
 # - Respect PICO_SDK_PATH if already set.
@@ -74,6 +75,8 @@ CMAKE_ARGS ?=
 PICO_BOARD_HEADER_DIRS ?= $(abspath $(PICO_PROJECT_DIR));$(abspath $(PICO_PROJECT_DIR)/..);/workspaces/computercard-dev-env/boards
 
 CMAKE_ARGS += -DCMAKE_EXPORT_COMPILE_COMMANDS=ON $(CMAKE_PICO_SDK_ARGS) \
+	-DCMAKE_CXX_STANDARD=$(CMAKE_CXX_STANDARD) \
+	-DCMAKE_CXX_STANDARD_REQUIRED=ON \
 	-DPICO_BOARD_HEADER_DIRS="$(PICO_BOARD_HEADER_DIRS)"
 
 NINJA := $(shell command -v ninja 2>/dev/null)
