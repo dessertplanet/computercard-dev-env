@@ -11,6 +11,7 @@ If you want the deeper “how it works” details (auto-make, OpenOCD wiring, en
 - [Visual Studio Code](https://code.visualstudio.com)
 - [Docker Desktop](https://www.docker.com/products/docker-desktop/)  (Note you need to launch this once to ensure it gets set up, you may be prompted for admin permissions on MacOS. On Windows 11 it should automatically launch the Windows Subsystem for Linux which is fine and helpful. No real need to launch Docker Desktop ever again!)
 - [VS Code “Dev Containers” extension](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-containers)
+- OpenOCD (host-side, required for flashing/debugging via a debug probe)
 
 ### Hardware (for flashing/debugging)
 
@@ -41,9 +42,13 @@ Note: you can usually build without any hardware connected.
 
 5) (Optional) Flash using a debug probe + OpenOCD:
 
-    - Start OpenOCD on your host (this will need to be from a separate Terminal or Powershell window):
-     - macOS/Linux: `./start_openocd_host.sh`
-     - Windows: `powershell -ExecutionPolicy Bypass -File .\start_openocd_host.ps1`
+      - OpenOCD is required for this dev env to communicate with the debug probe hardware (see installation notes below)
+      - Connect the debug probe to your Workshop System target first.
+      - Start OpenOCD on your host (this will need to be from a separate Terminal or Powershell window):
+       - macOS/Linux: `./start_openocd_host.sh`
+       - Windows: `powershell -ExecutionPolicy Bypass -File .\start_openocd_host.ps1`
+      - After starting OpenOCD, you should see a line like:
+       - `Info : Listening on port 3333 for gdb connections`
    - Then in the container (in your card directory):
      - `make flash`
 
@@ -58,12 +63,15 @@ Note: you can usually build without any hardware connected.
 
 - Install Docker Desktop.
 - Install OpenOCD on the host (for `make flash` / debugging), e.g. via Homebrew:
+   - Install Homebrew: https://brew.sh/
   - `brew install openocd`
 
 ### Windows
 
 - Install Docker Desktop (WSL2 backend recommended).
 - Install OpenOCD on the host (for `make flash` / debugging).
+   - Install Chocolatey: https://chocolatey.org/
+   - Example: `choco install openocd`
 - If the debug probe shows up but OpenOCD can’t access it, you may need a WinUSB driver for the CMSIS-DAP interface.
 
 ### Linux
@@ -123,5 +131,5 @@ From the repo root:
 
 ## Troubleshooting
 
-- Container won’t connect to OpenOCD: ensure OpenOCD is running on the host and listening on port `3333`.
+- Container won’t connect to OpenOCD: ensure OpenOCD is running on the host and you see `Info : Listening on port 3333 for gdb connections` in the OpenOCD output.
 - Flash/debug still failing: see [README-development.md](README-development.md) for variables like `OPENOCD_HOST`, `OPENOCD_GDB_PORT`, and `GDB`.
