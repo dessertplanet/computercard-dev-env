@@ -1,6 +1,6 @@
-# ComputerCard Pico Dev Environment
+# ComputerCard Development Environment
 
-This repo helps you build, flash, and debug Raspberry Pi Pico / RP2040 “ComputerCard” firmware using the Pico SDK, with a VS Code Dev Container.
+This repo helps you build, flash, and debug RP2040 “ComputerCard” firmware for the Music Thing Workshop System using the Pico SDK, with a VS Code Dev Container.
 
 If you want the deeper “how it works” details (auto-make, OpenOCD wiring, environment variables), see [README-development.md](README-development.md).
 
