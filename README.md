@@ -33,6 +33,7 @@ Note: you can usually build without any hardware connected.
 
    - Command Palette (command/ctrl-shift-P) → “Dev Containers: Reopen in Container” (or use the prompt that appears when you open VS Code)
    - **The first time you launch the container it will take up to 10 minutes to provision.** Subsequent rebuilds and reloads will be much faster.
+   - You may get a prompt to reload the window for the Cortex Debug plugin. You should do this but only after the original provision settles and you see the file tree etc.
 
 4) Build the starter card:
 
@@ -47,8 +48,9 @@ Note: you can usually build without any hardware connected.
       - Start OpenOCD on your host (this will need to be from a separate Terminal or Powershell window):
        - macOS/Linux: `./start_openocd_host.sh`
        - Windows: `powershell -ExecutionPolicy Bypass -File .\start_openocd_host.ps1`
-      - After starting OpenOCD, you should see a line like:
+      - After starting OpenOCD, you should see a yellow light on your debug probe, and you should see a line like:
        - `Info : Listening on port 3333 for gdb connections`
+      - You should leave this terminal/powershell window open in the background. You won't need to interact with it again and from the dev environment you will then be able to flash and debug with `make flash` and F5
    - Then in the container (in your card directory):
      - `make flash`
 
