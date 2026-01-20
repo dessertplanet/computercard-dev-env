@@ -33,6 +33,7 @@ Note: you can usually build without any hardware connected.
 
    - Command Palette (command/ctrl-shift-P) → “Dev Containers: Reopen in Container” (or use the prompt that appears when you open VS Code)
    - **The first time you launch the container it will take up to 10 minutes to provision.** Subsequent rebuilds and reloads will be much faster.
+   - You may get a prompt to reload the window for the Cortex Debug plugin. You should do this but only after the original provision settles and you see the file tree etc.
 
 4) Build the starter card:
 
