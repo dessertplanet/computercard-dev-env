@@ -9,7 +9,7 @@ If you want the deeper “how it works” details (auto-make, OpenOCD wiring, en
 ### Software (host machine / your laptop)
 
 - [Visual Studio Code](https://code.visualstudio.com)
-- [Docker Desktop](https://www.docker.com/products/docker-desktop/)  (Note you need to launch this once to ensure it gets set up, you may be prompted for admin permissions on MacOS. On Windows 11 it should automatically launch the Windows Subsystem for Linux which is fine and helpful)
+- [Docker Desktop](https://www.docker.com/products/docker-desktop/)  (Note you need to launch this once to ensure it gets set up, you may be prompted for admin permissions on MacOS. On Windows 11 it should automatically launch the Windows Subsystem for Linux which is fine and helpful. No real need to launch Docker Desktop ever again!)
 - [VS Code “Dev Containers” extension](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-containers)
 
 ### Hardware (for flashing/debugging)
