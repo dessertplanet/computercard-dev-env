@@ -1,0 +1,7 @@
+# Ensure Linux-facing scripts and makefiles keep LF endings even on Windows checkouts.
+# This avoids bash/make failures inside the devcontainer.
+
+*.sh text eol=lf
+*.mk text eol=lf
+Makefile text eol=lf
+GNUmakefile text eol=lf
