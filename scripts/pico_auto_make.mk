@@ -184,19 +184,35 @@ flash: uf2
 	  fi; \
 	  echo "Flashing $$elf via OpenOCD at $(OPENOCD_HOST):$(OPENOCD_GDB_PORT)"; \
 	  rc=0; \
-	  "$$gdb_cmd" -q -nx -batch \
-	    -ex "target extended-remote $(OPENOCD_HOST):$(OPENOCD_GDB_PORT)" \
-	    -ex "monitor reset init" \
-	    -ex "load" \
-	    -ex "monitor reset run" \
-	    -ex "detach" \
-	    "$$elf" || rc=$$?; \
-	  if [[ $$rc -eq 0 ]]; then \
-	    echo "FLASH OK"; \
-	  else \
-	    echo "FLASH FAILED (gdb exit $$rc)"; \
-	    echo "Hint: if this fails intermittently, try running 'make flash' again."; \
-	  fi; \
+	  for attempt in 1 2; do \
+	    if ! (echo >"/dev/tcp/$(OPENOCD_HOST)/$(OPENOCD_GDB_PORT)") >/dev/null 2>&1; then \
+	      if [[ $$attempt -eq 1 ]]; then \
+	        echo "Can't connect to OpenOCD at $(OPENOCD_HOST):$(OPENOCD_GDB_PORT); retrying once..." >&2; \
+	        sleep 1; \
+	        continue; \
+	      fi; \
+	      echo "Start OpenOCD on the host, e.g.:" >&2; \
+	      echo "  openocd -f interface/cmsis-dap.cfg -f target/rp2040.cfg -c \"adapter speed 5000\"" >&2; \
+	      fail "cannot connect to OpenOCD GDB server at $(OPENOCD_HOST):$(OPENOCD_GDB_PORT)"; \
+	    fi; \
+	    rc=0; \
+	    "$$gdb_cmd" -q -nx -batch \
+	      -ex "target extended-remote $(OPENOCD_HOST):$(OPENOCD_GDB_PORT)" \
+	      -ex "monitor reset init" \
+	      -ex "load" \
+	      -ex "monitor reset run" \
+	      -ex "detach" \
+	      "$$elf" || rc=$$?; \
+	    if [[ $$rc -eq 0 ]]; then \
+	      echo "FLASH OK"; \
+	      exit 0; \
+	    fi; \
+	    if [[ $$attempt -eq 1 ]]; then \
+	      echo "FLASH FAILED (gdb exit $$rc); retrying once..."; \
+	      sleep 0.5; \
+	    fi; \
+	  done; \
+	  echo "FLASH FAILED (gdb exit $$rc)"; \
 	  exit $$rc
 
 help:
