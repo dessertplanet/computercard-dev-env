@@ -16,8 +16,7 @@ If you want the deeper “how it works” details (auto-make, OpenOCD wiring, en
 
 - A target Workshop Computer
 - A USB cable for the target
-- Optional but recommended: a debug probe (CMSIS-DAP)
-  - Adafruit Pico Debug Probe info: https://learn.adafruit.com/raspberry-pi-pico-debug-probe
+- Optional but recommended: [a debug probe (CMSIS-DAP)](https://www.adafruit.com/product/5699?srsltid=AfmBOorkEWewNy0JeAIm2ezrGlUNuRmwIGylu4z_UqYe02S_rFjOrdcW)
 
 Note: you can usually build without any hardware connected.
 
