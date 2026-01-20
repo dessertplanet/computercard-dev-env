@@ -31,27 +31,27 @@ Note: you can usually build without any hardware connected.
 
 3) Reopen in the devcontainer:
 
-- Command Palette → “Dev Containers: Reopen in Container” (or use the prompt that appears when you open VS Code)
-- The first time you launch the connector it will take up to 5 minutes to provision. Subsequently rebuilds and reloads will be much faster.
+   - Command Palette → “Dev Containers: Reopen in Container” (or use the prompt that appears when you open VS Code)
+   - The first time you launch the connector it will take up to 5 minutes to provision. Subsequently rebuilds and reloads will be much faster.
 
 4) Build the starter card:
 
-- In VS Code terminal (inside the container):
-  - `cd XX_newcard`
-  - `make build`
+   - In VS Code terminal (inside the container):
+     - `cd XX_newcard`
+     - `make build`
 
 5) (Optional) Flash using a debug probe + OpenOCD:
 
-- Start OpenOCD on your host (this will need to be from a separate Terminal or Powershell window):
-  - macOS/Linux: `./start_openocd_host.sh`
-  - Windows: `powershell -ExecutionPolicy Bypass -File .\start_openocd_host.ps1`
-- Then in the container (in your card directory):
-  - `make flash`
+    - Start OpenOCD on your host (this will need to be from a separate Terminal or Powershell window):
+     - macOS/Linux: `./start_openocd_host.sh`
+     - Windows: `powershell -ExecutionPolicy Bypass -File .\start_openocd_host.ps1`
+   - Then in the container (in your card directory):
+     - `make flash`
 
 6) (Optional) Debug (F5):
 
-- Start OpenOCD on the host first (Step 5)
-- In VS Code (attached to the devcontainer), press `F5`.
+   - Start OpenOCD on the host first (Step 5)
+   - In VS Code (attached to the devcontainer), press `F5`.
 
 ## Platform prerequisites
 
