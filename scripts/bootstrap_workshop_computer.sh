@@ -1,83 +1,37 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-REPO_URL="https://github.com/TomWhitwell/Workshop_Computer.git"
-DEST_DIR="/workspaces/computercard-dev-env/Workshop_Computer"
-SOURCE_DIR="/opt/Workshop_Computer"
+ROOT_DIR="/workspaces/computercard-dev-env"
+SUBMODULE_PATH="Workshop_Computer"
 
-rewrite_github_ssh_submodules_to_https() {
-  local repo_dir="$1"
-  local gitmodules="$repo_dir/.gitmodules"
-
-  if [[ ! -f "$gitmodules" ]]; then
-    return 0
-  fi
-
-  local changed=0
-
-  while IFS= read -r line; do
-    # Format: <key> <value>
-    local key url new_url
-    key="${line%% *}"
-    url="${line#* }"
-
-    new_url="$url"
-    if [[ "$url" == git@github.com:* ]]; then
-      new_url="https://github.com/${url#git@github.com:}"
-    elif [[ "$url" == ssh://git@github.com/* ]]; then
-      new_url="https://github.com/${url#ssh://git@github.com/}"
-    fi
-
-    if [[ "$new_url" != "$url" ]]; then
-      git -C "$repo_dir" config -f .gitmodules "$key" "$new_url"
-      changed=1
-    fi
-  done < <(git -C "$repo_dir" config -f .gitmodules --get-regexp '^submodule\\..*\\.url$' 2>/dev/null || true)
-
-  if [[ $changed -eq 1 ]]; then
-    echo "Rewrote GitHub SSH submodule URLs to HTTPS in .gitmodules"
-    # Ensure the rewritten URLs are also reflected in .git/config.
-    git -C "$repo_dir" submodule sync --recursive >/dev/null 2>&1 || true
-  fi
-}
-
-if [[ -d "$DEST_DIR/.git" ]]; then
-  echo "Workshop_Computer already present: $DEST_DIR"
-  rewrite_github_ssh_submodules_to_https "$DEST_DIR"
-  git -C "$DEST_DIR" submodule update --init --recursive >/dev/null 2>&1 || true
-  git config --global --add safe.directory "$DEST_DIR" >/dev/null 2>&1 || true
+if ! git -C "$ROOT_DIR" rev-parse --is-inside-work-tree >/dev/null 2>&1; then
+  echo "Skipping Workshop_Computer init: not a git worktree."
   exit 0
 fi
 
-if [[ -e "$DEST_DIR" && ! -d "$DEST_DIR" ]]; then
-  echo "Warning: $DEST_DIR exists and is not a directory; skipping clone." >&2
+if [[ ! -f "$ROOT_DIR/.gitmodules" ]]; then
+  echo "Skipping Workshop_Computer init: no .gitmodules present."
   exit 0
 fi
 
-mkdir -p "$(dirname "$DEST_DIR")"
+submodule_key=$(git -C "$ROOT_DIR" config -f .gitmodules --get-regexp '^submodule\..*\.path$' 2>/dev/null \
+  | awk -v path="$SUBMODULE_PATH" '$2 == path {print $1; exit 0}')
 
-if [[ -d "$SOURCE_DIR/.git" ]]; then
-  echo "Copying Workshop_Computer from image into $DEST_DIR"
-  cp -a "$SOURCE_DIR" "$DEST_DIR"
+if [[ -z "${submodule_key}" ]]; then
+  echo "Skipping Workshop_Computer init: no submodule configured at ${SUBMODULE_PATH}."
+  exit 0
+fi
+
+status_line=$(git -C "$ROOT_DIR" submodule status "$SUBMODULE_PATH" 2>/dev/null || true)
+
+if [[ -z "$status_line" ]]; then
+  echo "Skipping Workshop_Computer init: submodule status unavailable for ${SUBMODULE_PATH}."
+  exit 0
+fi
+
+if [[ "$status_line" == -* ]]; then
+  echo "Initializing submodule ${SUBMODULE_PATH}."
+  git -C "$ROOT_DIR" submodule update --init --recursive "$SUBMODULE_PATH"
 else
-  echo "Cloning Workshop_Computer into $DEST_DIR"
-  echo "  repo: $REPO_URL"
-
-  # Keep provisioning resilient: network can be unavailable during devcontainer build.
-  # Shallow clone keeps it fast; users can 'git fetch --unshallow' later if needed.
-  # Use recursive clone to pull submodules in one step.
-  if ! git clone --depth 1 --recurse-submodules --shallow-submodules "$REPO_URL" "$DEST_DIR"; then
-    echo "Warning: failed to clone Workshop_Computer (network unavailable?)." >&2
-    echo "You can clone it later with:" >&2
-    echo "  git clone $REPO_URL Workshop_Computer" >&2
-    exit 0
-  fi
+  echo "Submodule ${SUBMODULE_PATH} already initialized."
 fi
-
-rewrite_github_ssh_submodules_to_https "$DEST_DIR"
-
-git -C "$DEST_DIR" submodule update --init --recursive >/dev/null 2>&1 || true
-
-git config --global --add safe.directory "$DEST_DIR" >/dev/null 2>&1 || true
-
-echo "Workshop_Computer clone complete."

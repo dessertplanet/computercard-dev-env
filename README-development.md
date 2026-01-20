@@ -19,7 +19,9 @@ If you’re just trying to get set up and build/flash/debug a card, start with [
 
 ## Workshop_Computer
 
-The devcontainer no longer clones `Workshop_Computer/` automatically. If you want the upstream cards/examples available in the workspace, clone it manually into the repo root:
+If `Workshop_Computer/` is configured as a git submodule, the devcontainer will initialize it on create **only if** it is not already initialized. This respects custom forks because it uses the URL in `.gitmodules`.
+
+If you prefer a plain clone instead of a submodule, clone it manually into the repo root:
 
 - `git clone https://github.com/TomWhitwell/Workshop_Computer.git Workshop_Computer`
 
