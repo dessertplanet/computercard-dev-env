@@ -32,7 +32,7 @@ Note: you can usually build without any hardware connected.
 3) Reopen in the devcontainer:
 
    - Command Palette → “Dev Containers: Reopen in Container” (or use the prompt that appears when you open VS Code)
-   - The first time you launch the connector it will take up to 5 minutes to provision. Subsequently rebuilds and reloads will be much faster.
+   - The first time you launch the container it will take up to 5 minutes to provision. Subsequently rebuilds and reloads will be much faster.
 
 4) Build the starter card:
 
