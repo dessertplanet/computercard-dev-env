@@ -127,6 +127,11 @@ build: clean configure
 	  while IFS= read -r -d '' f; do \
 	    found=1; \
 	    cp -f "$$f" "UF2/"; \
+	    cwd="$$(pwd)"; \
+	    rel="$$cwd"; \
+	    rel="$${rel#/workspaces/}"; \
+	    dest="$$rel/UF2/$$(basename "$$f")"; \
+	    echo "UF2 copied to $$dest"; \
 	  done < <(find "$(BUILD_DIR)" -maxdepth 4 -type f -name '*.uf2' -print0 2>/dev/null); \
 	  if [[ $$found -eq 0 ]]; then \
 	    true; \
