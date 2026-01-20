@@ -80,6 +80,8 @@ if [[ $CLEAN -eq 1 ]]; then
   exit 0
 fi
 
+# Always clean before (re)configure/build for reproducible builds.
+rm -rf "$BUILD_DIR"
 mkdir -p "$BUILD_DIR"
 
 # Cache directory for CMake FetchContent downloads (shared across builds).

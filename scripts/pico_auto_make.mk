@@ -117,7 +117,7 @@ all: build
 configure:
 	$(CMAKE) -S "$(PICO_PROJECT_DIR)" -B "$(BUILD_DIR)" $(CMAKE_GEN_ARGS) $(CMAKE_ARGS)
 
-build: configure
+build: clean configure
 	$(CMAKE) --build "$(BUILD_DIR)"
 	@# Stage UF2 outputs into ./UF2 for convenience.
 	@mkdir -p "UF2"
