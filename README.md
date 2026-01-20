@@ -31,7 +31,7 @@ Note: you can usually build without any hardware connected.
 
 3) Reopen in the devcontainer:
 
-   - Command Palette → “Dev Containers: Reopen in Container” (or use the prompt that appears when you open VS Code)
+   - Command Palette (command/ctrl-shift-P) → “Dev Containers: Reopen in Container” (or use the prompt that appears when you open VS Code)
    - The first time you launch the container it will take up to 5 minutes to provision. Subsequently rebuilds and reloads will be much faster.
 
 4) Build the starter card:
@@ -123,6 +123,31 @@ From a card directory (example: `XX_newcard/`):
    - This command will create a `./UF2` directory in the card directory (if one does not exist) and copy a read-to-flash compiled UF2 there. If there is already a UF2 directory and file there, the existing one may be overwritten. 
 - `make clean` — remove `./build/`
 - `make flash` — flash via host OpenOCD (requires a debug probe)
+
+## VS Code tasks and keyboard shortcuts
+
+- VS Code tasks are set up to build and flash the card corresponding to the currently open file in VS Code.
+- This repo includes an example you can copy/paste into your user keybindings: [.vscode/keybindings.example.json](.vscode/keybindings.example.json)
+
+Shortcut setup steps:
+
+1. Open Command Palette (command/ctrl-shift-P) → “Preferences: Open Keyboard Shortcuts (JSON)”.
+2. Copy the entries from [.vscode/keybindings.example.json](.vscode/keybindings.example.json) into your user `keybindings.json`.
+3. Adjust the key combos if they conflict with your existing shortcuts.
+
+Where is `keybindings.json`
+
+- macOS: `~/Library/Application Support/Code/User/keybindings.json`
+- Linux: `~/.config/Code/User/keybindings.json`
+- Windows: `%APPDATA%\Code\User\keybindings.json`
+
+Note: keybindings are user-level in your local VS Code install (host machine), not inside the devcontainer.
+
+VS Code docs: https://code.visualstudio.com/docs/getstarted/keybindings#_advanced-customization
+
+Note: these tasks pick the build/flash directory based on the file you currently have open. If a shortcut seems to do nothing, click a source file inside your card folder (one that lives under a directory containing `CMakeLists.txt`) and try again.
+
+Once installed, you can run the same actions via Command Palette (command/ctrl-shift-P) → “Tasks: Run Task”, and/or bind them to keys.
 
 ## Troubleshooting
 

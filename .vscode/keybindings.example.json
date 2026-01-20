@@ -1,0 +1,12 @@
+[
+  {
+    "key": "ctrl+alt+b",
+    "command": "workbench.action.tasks.runTask",
+    "args": "ComputerCard: make UF2"
+  },
+  {
+    "key": "ctrl+alt+f",
+    "command": "workbench.action.tasks.runTask",
+    "args": "ComputerCard: flash UF2"
+  }
+]

@@ -1,31 +1,23 @@
 {
   "version": "2.0.0",
-  "inputs": [
-    {
-      "id": "picoProjectDir",
-      "type": "promptString",
-      "description": "Project directory to build (relative to workspace, e.g. XX_newcard or Workshop_Computer/releases/22_sheep)",
-      "default": "XX_newcard"
-    }
-  ],
   "tasks": [
     {
-      "label": "Pico: Build (XX_newcard)",
+      "label": "ComputerCard: make UF2",
       "type": "shell",
-      "command": "make",
-      "args": ["build"],
+      "command": "${workspaceFolder}/scripts/vscode_task_make.sh",
+      "args": ["build", "${fileDirname}"],
       "options": {
-        "cwd": "${workspaceFolder}/XX_newcard"
+        "cwd": "${workspaceFolder}"
       },
       "problemMatcher": []
     },
     {
-      "label": "Pico: Build (make build)",
+      "label": "ComputerCard: flash UF2",
       "type": "shell",
-      "command": "make",
-      "args": ["build"],
+      "command": "${workspaceFolder}/scripts/vscode_task_make.sh",
+      "args": ["flash", "${fileDirname}"],
       "options": {
-        "cwd": "${workspaceFolder}/${input:picoProjectDir}"
+        "cwd": "${workspaceFolder}"
       },
       "problemMatcher": []
     }
