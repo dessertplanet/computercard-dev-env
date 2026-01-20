@@ -132,7 +132,7 @@ Once installed, you can run the same actions via Command Palette (command/ctrl-s
 - Container won’t connect to OpenOCD: ensure OpenOCD is running on the host and you see `Info : Listening on port 3333 for gdb connections` in the OpenOCD output.
 - Flash/debug still failing: see [README-development.md](README-development.md) for variables like `OPENOCD_HOST`, `OPENOCD_GDB_PORT`, and `GDB`.
 
-### Pico SDK release build status (2026-01-20)
+### Released PicoSDK Card Build Status (2026-01-20)
 
 Status is based on manual testing of all Pico SDK cards in the main repo using the `make` command in the folder containing the CMakeLists.txt for each project.
 
