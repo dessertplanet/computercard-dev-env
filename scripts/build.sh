@@ -99,6 +99,25 @@ if [[ -n "${PICO_SDK_PATH:-}" ]]; then
   CMAKE_ARGS+=("-DPICO_SDK_PATH=${PICO_SDK_PATH}")
 fi
 
+if [[ -n "${PICO_TOOLCHAIN_PATH:-}" ]]; then
+  CMAKE_ARGS+=("-DPICO_TOOLCHAIN_PATH=${PICO_TOOLCHAIN_PATH}")
+else
+  TOOLCHAIN_BIN="$(command -v arm-none-eabi-gcc || true)"
+  if [[ -n "$TOOLCHAIN_BIN" ]]; then
+    TOOLCHAIN_ROOT="$(cd "$(dirname "$TOOLCHAIN_BIN")/.." && pwd)"
+    CMAKE_ARGS+=("-DPICO_TOOLCHAIN_PATH=${TOOLCHAIN_ROOT}")
+  fi
+fi
+
+TOOLCHAIN_C="$(command -v arm-none-eabi-gcc || true)"
+TOOLCHAIN_CXX="$(command -v arm-none-eabi-g++ || true)"
+if [[ -n "$TOOLCHAIN_C" ]]; then
+  CMAKE_ARGS+=("-DCMAKE_C_COMPILER=${TOOLCHAIN_C}")
+fi
+if [[ -n "$TOOLCHAIN_CXX" ]]; then
+  CMAKE_ARGS+=("-DCMAKE_CXX_COMPILER=${TOOLCHAIN_CXX}")
+fi
+
 # Reuse downloaded dependencies across builds.
 CMAKE_ARGS+=("-DFETCHCONTENT_BASE_DIR=${DEPS_DIR}/fetchcontent")
 CMAKE_ARGS+=("-DFETCHCONTENT_UPDATES_DISCONNECTED=ON")

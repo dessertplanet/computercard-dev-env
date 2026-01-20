@@ -15,11 +15,26 @@ RUN apt-get update \
         python3-pip \
         pkg-config \
         libusb-1.0-0-dev \
-        gcc-arm-none-eabi \
-        binutils-arm-none-eabi \
-        libnewlib-arm-none-eabi \
-        libstdc++-arm-none-eabi-newlib \
+        wget \
+        xz-utils \
+        libncurses5 \
+    && if [ "$(dpkg --print-architecture)" = "amd64" ]; then \
+        apt-get install -y --no-install-recommends libc6-i386; \
+    fi \
     && rm -rf /var/lib/apt/lists/*
+
+# Install ARM GCC toolchain 14.2.Rel1 to match typical macOS setup
+RUN if [ "$(dpkg --print-architecture)" = "arm64" ]; then \
+        TOOLCHAIN_URL="https://developer.arm.com/-/media/Files/downloads/gnu/14.2.rel1/binrel/arm-gnu-toolchain-14.2.rel1-aarch64-arm-none-eabi.tar.xz"; \
+    else \
+        TOOLCHAIN_URL="https://developer.arm.com/-/media/Files/downloads/gnu/14.2.rel1/binrel/arm-gnu-toolchain-14.2.rel1-x86_64-arm-none-eabi.tar.xz"; \
+    fi \
+    && wget -q "$TOOLCHAIN_URL" -O /tmp/arm-toolchain.tar.xz \
+    && mkdir -p /opt/arm-toolchain \
+    && tar -xf /tmp/arm-toolchain.tar.xz -C /opt/arm-toolchain --strip-components=1 \
+    && rm /tmp/arm-toolchain.tar.xz
+
+ENV PATH="/opt/arm-toolchain/bin:${PATH}"
 
 RUN git clone --depth 1 --branch ${PICO_SDK_VERSION} https://github.com/raspberrypi/pico-sdk.git /opt/pico-sdk \
     && git -C /opt/pico-sdk submodule update --init --recursive

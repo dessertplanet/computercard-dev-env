@@ -74,10 +74,31 @@ endif
 CMAKE_ARGS ?=
 PICO_BOARD_HEADER_DIRS ?= $(abspath $(PICO_PROJECT_DIR));$(abspath $(PICO_PROJECT_DIR)/..);/workspaces/computercard-dev-env/boards
 
+# Toolchain resolution:
+# - Respect PICO_TOOLCHAIN_PATH if already set.
+# - Otherwise infer from arm-none-eabi-gcc on PATH.
+TOOLCHAIN_C := $(strip $(shell command -v arm-none-eabi-gcc 2>/dev/null))
+TOOLCHAIN_CXX := $(strip $(shell command -v arm-none-eabi-g++ 2>/dev/null))
+ifneq ($(TOOLCHAIN_C),)
+	TOOLCHAIN_ROOT := $(abspath $(dir $(TOOLCHAIN_C))/..)
+	PICO_TOOLCHAIN_PATH ?= $(TOOLCHAIN_ROOT)
+endif
+
 CMAKE_ARGS += -DCMAKE_EXPORT_COMPILE_COMMANDS=ON $(CMAKE_PICO_SDK_ARGS) \
 	-DCMAKE_CXX_STANDARD=$(CMAKE_CXX_STANDARD) \
 	-DCMAKE_CXX_STANDARD_REQUIRED=ON \
 	-DPICO_BOARD_HEADER_DIRS="$(PICO_BOARD_HEADER_DIRS)"
+
+ifneq ($(strip $(PICO_TOOLCHAIN_PATH)),)
+  CMAKE_ARGS += -DPICO_TOOLCHAIN_PATH=$(PICO_TOOLCHAIN_PATH)
+endif
+
+ifneq ($(strip $(TOOLCHAIN_C)),)
+	CMAKE_ARGS += -DCMAKE_C_COMPILER=$(TOOLCHAIN_C)
+endif
+ifneq ($(strip $(TOOLCHAIN_CXX)),)
+	CMAKE_ARGS += -DCMAKE_CXX_COMPILER=$(TOOLCHAIN_CXX)
+endif
 
 NINJA := $(shell command -v ninja 2>/dev/null)
 ifneq ($(strip $(NINJA)),)
