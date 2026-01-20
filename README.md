@@ -74,7 +74,9 @@ Note: you can usually build without any hardware connected.
 
 ## Building cards from Workshop_Computer
 
-When the container is provisioned, you should have a `Workshop_Computer/` folder at the repo root.
+`Workshop_Computer/` is not cloned automatically. If you want the upstream cards/examples locally, clone it into the repo root:
+
+- `git clone https://github.com/TomWhitwell/Workshop_Computer.git Workshop_Computer`
 
 ### How to tell which cards use the Pico SDK
 

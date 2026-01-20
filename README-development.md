@@ -17,9 +17,11 @@ If you’re just trying to get set up and build/flash/debug a card, start with [
 - `scripts/pico_auto_make.mk`: auto-injected Make support for Pico SDK CMake projects that don’t have a local Makefile.
 - `.vscode/`: build tasks and Cortex-Debug launch configs.
 
-## Workshop_Computer bootstrap
+## Workshop_Computer
 
-The devcontainer image clones the upstream repo into `/opt/Workshop_Computer` during build. On devcontainer creation, `scripts/bootstrap_workshop_computer.sh` copies it into `Workshop_Computer/` if it isn’t already present (with a network clone as a fallback).
+The devcontainer no longer clones `Workshop_Computer/` automatically. If you want the upstream cards/examples available in the workspace, clone it manually into the repo root:
+
+- `git clone https://github.com/TomWhitwell/Workshop_Computer.git Workshop_Computer`
 
 Intent:
 

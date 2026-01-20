@@ -24,29 +24,6 @@ RUN apt-get update \
 RUN git clone --depth 1 --branch ${PICO_SDK_VERSION} https://github.com/raspberrypi/pico-sdk.git /opt/pico-sdk \
     && git -C /opt/pico-sdk submodule update --init --recursive
 
-RUN bash -c 'set -euo pipefail; \
-        repo_url="https://github.com/TomWhitwell/Workshop_Computer.git"; \
-        dest_dir="/opt/Workshop_Computer"; \
-        echo "Cloning Workshop_Computer into ${dest_dir}"; \
-        git clone --depth 1 "${repo_url}" "${dest_dir}"; \
-        if [[ -f "${dest_dir}/.gitmodules" ]]; then \
-            while IFS= read -r line; do \
-                key="${line%% *}"; \
-                url="${line#* }"; \
-                new_url="${url}"; \
-                if [[ "${url}" == git@github.com:* ]]; then \
-                    new_url="https://github.com/${url#git@github.com:}"; \
-                elif [[ "${url}" == ssh://git@github.com/* ]]; then \
-                    new_url="https://github.com/${url#ssh://git@github.com/}"; \
-                fi; \
-                if [[ "${new_url}" != "${url}" ]]; then \
-                    git -C "${dest_dir}" config -f .gitmodules "${key}" "${new_url}"; \
-                fi; \
-            done < <(git -C "${dest_dir}" config -f .gitmodules --get-regexp "^submodule\\..*\\.url$" || true); \
-            git -C "${dest_dir}" submodule sync --recursive; \
-            git -C "${dest_dir}" submodule update --init --recursive --depth 1; \
-        fi'
-
 # Make the SDK path available during the picotool build.
 ENV PICO_SDK_PATH=/opt/pico-sdk
 
