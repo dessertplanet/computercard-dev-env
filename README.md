@@ -9,7 +9,7 @@ If you want the deeper “how it works” details (auto-make, OpenOCD wiring, en
 ### Software (host machine / your laptop)
 
 - [Visual Studio Code](https://code.visualstudio.com)
-- [Docker Desktop](https://www.docker.com/products/docker-desktop/) 
+- [Docker Desktop](https://www.docker.com/products/docker-desktop/)  (Note you need to launch this once to ensure it gets set up, you may be prompted for admin permissions on MacOS. On Windows 11 it should automatically launch the Windows Subsystem for Linux which is fine and helpful)
 - [VS Code “Dev Containers” extension](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-containers)
 
 ### Hardware (for flashing/debugging)
@@ -23,15 +23,16 @@ Note: you can usually build without any hardware connected.
 
 ## Quick start
 
+0) Ensure you have the prerequites described above installed (and git!)
+
 1) Clone (or fork and then clone) this repo.
 
 2) Open it in VS Code.
 
 3) Reopen in the devcontainer:
 
-- Command Palette → “Dev Containers: Reopen in Container”
-
-During the first container creation (before VS Code finishes attaching), the devcontainer bootstraps by cloning the upstream Workshop_Computer repo into `Workshop_Computer/`.
+- Command Palette → “Dev Containers: Reopen in Container” (or use the prompt that appears when you open VS Code)
+- The first time you launch the connector it will take up to 5 minutes to provision. Subsequently rebuilds and reloads will be much faster.
 
 4) Build the starter card:
 
