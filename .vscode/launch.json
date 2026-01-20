@@ -13,7 +13,7 @@
       "gdbPath": "gdb-multiarch",
       "executable": "${workspaceFolder}/XX_newcard/build/passthru.elf",
 
-      "preLaunchTask": "Pico: Build (XX_newcard)",
+      "preLaunchTask": "ComputerCard: make UF2",
 
       "runToEntryPoint": "main",
       "postAttachCommands": [

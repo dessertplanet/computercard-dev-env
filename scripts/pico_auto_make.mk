@@ -117,25 +117,33 @@ all: build
 configure:
 	$(CMAKE) -S "$(PICO_PROJECT_DIR)" -B "$(BUILD_DIR)" $(CMAKE_GEN_ARGS) $(CMAKE_ARGS)
 
-build: clean configure
-	$(CMAKE) --build "$(BUILD_DIR)"
-	@# Stage UF2 outputs into ./UF2 for convenience.
-	@mkdir -p "UF2"
-	@set -e; \
-	  shopt -s nullglob; \
-	  found=0; \
-	  while IFS= read -r -d '' f; do \
-	    found=1; \
-	    cp -f "$$f" "UF2/"; \
-	    cwd="$$(pwd)"; \
-	    rel="$$cwd"; \
-	    rel="$${rel#/workspaces/}"; \
-	    dest="$$rel/UF2/$$(basename "$$f")"; \
-	    echo "UF2 copied to $$dest"; \
-	  done < <(find "$(BUILD_DIR)" -maxdepth 4 -type f -name '*.uf2' -print0 2>/dev/null); \
-	  if [[ $$found -eq 0 ]]; then \
-	    true; \
-	  fi
+build:
+	@set -uo pipefail; \
+	  run_build() { \
+	    "$(CMAKE)" -S "$(PICO_PROJECT_DIR)" -B "$(BUILD_DIR)" $(CMAKE_GEN_ARGS) $(CMAKE_ARGS) || return $$?; \
+	    "$(CMAKE)" --build "$(BUILD_DIR)" || return $$?; \
+	    mkdir -p "UF2"; \
+	    shopt -s nullglob; \
+	    found=0; \
+	    while IFS= read -r -d '' f; do \
+	      found=1; \
+	      cp -f "$$f" "UF2/"; \
+	      cwd="$$(pwd)"; \
+	      rel="$$cwd"; \
+	      rel="$${rel#/workspaces/}"; \
+	      dest="$$rel/UF2/$$(basename "$$f")"; \
+	      echo "UF2 copied to $$dest"; \
+	    done < <(find "$(BUILD_DIR)" -maxdepth 4 -type f -name '*.uf2' -print0 2>/dev/null); \
+	    if [[ $$found -eq 0 ]]; then \
+	      true; \
+	    fi; \
+	  }; \
+	  if run_build; then \
+	    exit 0; \
+	  fi; \
+	  echo "Build failed; cleaning and retrying once..."; \
+	  rm -rf "$(BUILD_DIR)"; \
+	  run_build
 
 clean:
 	rm -rf "$(BUILD_DIR)"
