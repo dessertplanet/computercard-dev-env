@@ -120,14 +120,9 @@ Reference on how to use `ComputerCard.h`:
 From a card directory (example: `XX_newcard/`):
 
 - `make` / `make build` — configure + build into `./build/`
+   - These commands will create a UF2 directory in the card directory (if one does not exist) and copy a read-to-flash compiled UF2 there. If there is already a UF2 directory and file there, the existing one may be overwritten. 
 - `make clean` — remove `./build/`
 - `make flash` — flash via host OpenOCD (requires a debug probe)
-
-From the repo root:
-
-- `make XX_newcard` — build that directory
-- `make .` — build the current directory
-- `make ComputerCard_Examples/<example>` — build one example
 
 ## Troubleshooting
 
