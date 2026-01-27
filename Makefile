@@ -76,7 +76,7 @@ all:
 	total=$${#targets[@]}; \
 	successes=$$((total - failures)); \
 	echo ""; \
-	echo "| Target | Status |"; \
+	echo "| Target path | Build status |"; \
 	echo "| --- | --- |"; \
 	while IFS=$$'\t' read -r target status; do \
 		echo "| $$target | $$status |"; \
