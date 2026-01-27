@@ -65,7 +65,7 @@ all:
 			elif [[ "$$picosdk_hit" == "yes" ]]; then \s
 				statuses+=("❌ Failed (Pico SDK version mismatch)"); \
 			else \
-				statuses+=("❌ Failed"); \
+				statuses+=("❌ Failed (Compile errors)"); \
 			fi; \
 			failures=$$((failures+1)); \
 		fi; \
