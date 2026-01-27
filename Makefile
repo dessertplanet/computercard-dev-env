@@ -66,7 +66,7 @@ all:
 		fi; \
 		found=1; \
 		targets+=("$$dir"); \
-		statuses+=("⚠️ Missing CMakeLists.txt"); \
+		statuses+=("❌ Missing CMakeLists.txt"); \
 		failures=$$((failures+1)); \
 	done < <(find "$(RELEASES_DIR)" -mindepth 2 -maxdepth 3 -type f -name ComputerCard.h ! -path "*/lua/*" -print0 | sort -z); \
 	if [[ $$found -eq 0 ]]; then \
