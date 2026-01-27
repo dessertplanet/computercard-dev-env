@@ -2,6 +2,7 @@ FROM mcr.microsoft.com/devcontainers/base:ubuntu-22.04
 
 ARG DEBIAN_FRONTEND=noninteractive
 ARG PICO_SDK_VERSION
+ARG TINYUSB_VERSION
 
 RUN if [ -z "$PICO_SDK_VERSION" ]; then \
         echo "PICO_SDK_VERSION is required. Set it in .devcontainer/devcontainer.json under build.args."; \
@@ -43,6 +44,12 @@ ENV PATH="/opt/arm-toolchain/bin:${PATH}"
 
 RUN git clone --depth 1 --branch ${PICO_SDK_VERSION} https://github.com/raspberrypi/pico-sdk.git /opt/pico-sdk \
     && git -C /opt/pico-sdk submodule update --init --recursive
+
+# Pin TinyUSB to a known-good tag for Workshop_Computer releases
+RUN if [ -n "$TINYUSB_VERSION" ]; then \
+        git -C /opt/pico-sdk/lib/tinyusb fetch --tags \
+        && git -C /opt/pico-sdk/lib/tinyusb checkout ${TINYUSB_VERSION}; \
+    fi
 
 # Make the SDK path available during the picotool build.
 ENV PICO_SDK_PATH=/opt/pico-sdk

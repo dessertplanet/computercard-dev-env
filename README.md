@@ -144,13 +144,13 @@ Status is based on manual testing of all Pico SDK cards in the main repo using t
 | 04_BYO_Benjolin | OK |
 | 05_chord_blimey/src | OK |
 | 06_usb_audio/Rev1 | OK |
-| 06_usb_audio | new version does not build currently - custom TinyUSB fork? |
+| 06_usb_audio | OK |
 | 07_bumpers/src | OK |
 | 10_twists/src | OK |
 | 11_goldfish | OK |
 | 12_am_coupler | OK |
 | 14_cvmod | OK |
-| 20_reverb | OK |
+| 20_reverb | OK: Requires older TinyUSB version 0.18.0 (configure in devcontainer.json and rebuild container)  |
 | 21_resonator | OK |
 | 22_sheep | OK |
 | 25_utility_pair | separate repo |

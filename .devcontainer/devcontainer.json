@@ -3,7 +3,8 @@
   "build": {
     "dockerfile": "Dockerfile",
     "args": {
-      "PICO_SDK_VERSION": "2.2.0"
+      "PICO_SDK_VERSION": "2.2.0",
+      "TINYUSB_VERSION": "0.20.0"
     }
   },
   "workspaceFolder": "/workspaces/computercard-dev-env",

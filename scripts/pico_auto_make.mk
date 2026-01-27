@@ -89,6 +89,9 @@ CMAKE_ARGS += -DCMAKE_EXPORT_COMPILE_COMMANDS=ON $(CMAKE_PICO_SDK_ARGS) \
 	-DCMAKE_CXX_STANDARD_REQUIRED=ON \
 	-DPICO_BOARD_HEADER_DIRS="$(PICO_BOARD_HEADER_DIRS)"
 
+# Place UF2 artifacts alongside the project CMakeLists.txt
+UF2_DIR ?= $(PICO_PROJECT_DIR)/UF2
+
 ifneq ($(strip $(PICO_TOOLCHAIN_PATH)),)
   CMAKE_ARGS += -DPICO_TOOLCHAIN_PATH=$(PICO_TOOLCHAIN_PATH)
 endif
@@ -122,16 +125,17 @@ build:
 	  run_build() { \
 	    "$(CMAKE)" -S "$(PICO_PROJECT_DIR)" -B "$(BUILD_DIR)" $(CMAKE_GEN_ARGS) $(CMAKE_ARGS) || return $$?; \
 	    "$(CMAKE)" --build "$(BUILD_DIR)" || return $$?; \
-	    mkdir -p "UF2"; \
+	    mkdir -p "$(UF2_DIR)"; \
 	    shopt -s nullglob; \
 	    found=0; \
 	    while IFS= read -r -d '' f; do \
 	      found=1; \
-	      cp -f "$$f" "UF2/"; \
+	      cp -f "$$f" "$(UF2_DIR)/"; \
 	      cwd="$$(pwd)"; \
 	      rel="$$cwd"; \
 	      rel="$${rel#/workspaces/}"; \
-	      dest="$$rel/UF2/$$(basename "$$f")"; \
+	      dest="$$(cd "$(PICO_PROJECT_DIR)" && pwd)"; \
+	      dest="$${dest#/workspaces/}/UF2/$$(basename "$$f")"; \
 	      echo "UF2 copied to $$dest"; \
 	    done < <(find "$(BUILD_DIR)" -maxdepth 4 -type f -name '*.uf2' -print0 2>/dev/null); \
 	    build_abs="$$(cd "$(BUILD_DIR)" && pwd)"; \
@@ -156,8 +160,8 @@ clean:
 distclean: clean
 
 uf2: build
+	@find "$(UF2_DIR)" -maxdepth 1 -type f -name '*.uf2' -print 2>/dev/null || true
 	@find "$(BUILD_DIR)" -maxdepth 3 -type f -name '*.uf2' -print 2>/dev/null || true
-	@find . -maxdepth 3 -type f -name '*.uf2' -print 2>/dev/null || true
 
 # Flash via a running OpenOCD instance (typically on the host).
 #
@@ -187,8 +191,8 @@ flash: uf2
 	@set -uo pipefail; \
 	  fail() { echo "FLASH FAILED: $$*"; exit 2; }; \
 	  uf2="$(FLASH_UF2)"; \
-	  if [[ -z "$$uf2" && -d "UF2" ]]; then \
-	    uf2="$$(find "UF2" -maxdepth 1 -type f -name '*.uf2' -printf '%T@ %p\n' 2>/dev/null | sort -nr | head -n 1 | cut -d' ' -f2-)"; \
+	  if [[ -z "$$uf2" && -d "$(UF2_DIR)" ]]; then \
+	    uf2="$$(find "$(UF2_DIR)" -maxdepth 1 -type f -name '*.uf2' -printf '%T@ %p\n' 2>/dev/null | sort -nr | head -n 1 | cut -d' ' -f2-)"; \
 	  fi; \
 	  if [[ -z "$$uf2" ]]; then \
 	    uf2="$$(find "$(BUILD_DIR)" -maxdepth 4 -type f -name '*.uf2' -printf '%T@ %p\n' 2>/dev/null | sort -nr | head -n 1 | cut -d' ' -f2-)"; \
