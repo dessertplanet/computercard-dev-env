@@ -43,7 +43,8 @@ all:
 		dir=$$(dirname "$$cmake"); \
 		targets+=("$$dir"); \
 		echo "==> Building $$dir"; \
-		if (cd "$$dir" && make build); then \
+		log_file=$$(mktemp); \
+		if (cd "$$dir" && make build) 2>&1 | tee "$$log_file"; then \
 			if [[ "$$dir" == "$(RELEASES_DIR)/06_usb_audio" || "$$dir" == "$(RELEASES_DIR)/06_usb_audio/Rev1" ]]; then \
 				if (cd "$$dir" && make uf2); then \
 					statuses+=("✅ Success"); \
@@ -55,9 +56,20 @@ all:
 				statuses+=("✅ Success"); \
 			fi; \
 		else \
-			statuses+=("❌ Failed"); \
+			tinyusb_hit=$$(grep -Eqi "tinyusb|\\btusb\\b" "$$log_file" && echo yes || echo no); \
+			picosdk_hit=$$(grep -Eqi "pico[- ]sdk|PICO_SDK" "$$log_file" && echo yes || echo no); \
+			if [[ "$$tinyusb_hit" == "yes" && "$$picosdk_hit" == "yes" ]]; then \
+				statuses+=("❌ Failed (TinyUSB/Pico SDK)"); \
+			elif [[ "$$tinyusb_hit" == "yes" ]]; then \
+				statuses+=("❌ Failed (TinyUSB)"); \
+			elif [[ "$$picosdk_hit" == "yes" ]]; then \
+				statuses+=("❌ Failed (Pico SDK)"); \
+			else \
+				statuses+=("❌ Failed"); \
+			fi; \
 			failures=$$((failures+1)); \
 		fi; \
+		rm -f "$$log_file"; \
 	done < <(find "$(RELEASES_DIR)" -mindepth 2 -maxdepth 4 -type f -name CMakeLists.txt ! -path "*/lua/*" -print0 | sort -z); \
 	while IFS= read -r -d '' card; do \
 		dir=$$(dirname "$$card"); \
