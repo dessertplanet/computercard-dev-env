@@ -136,27 +136,25 @@ Once installed, you can run the same actions via Command Palette (command/ctrl-s
 
 ### Released PicoSDK Card Build Status (2026-01-27)
 
-Status is based on manual testing of all Pico SDK cards in the main repo using the `make` command in the folder containing the CMakeLists.txt for each project.
+Status is based on manual testing of all Pico SDK cards in the main repo using the `make all` command at the root of the dev env repo. Note that TinyUSB and Pico SDK versions can be configured if necessary in `.devcontainers/devcontainer.json`. Changes require a rebuild of the container which can take up to 10 minutes (subsequent reconnections are fast!)
 
-| Card (relative path) | Build Status |
+| Target path | Build status |
 | --- | --- |
-| 03_Turing_Machine/Rev_1_5_Code | OK |
-| 04_BYO_Benjolin | OK |
-| 05_chord_blimey/src | OK |
-| 06_usb_audio/Rev1 | OK |
-| 06_usb_audio | OK |
-| 07_bumpers/src | OK |
-| 10_twists/src | OK |
-| 11_goldfish | OK |
-| 12_am_coupler | OK |
-| 14_cvmod | OK |
-| 20_reverb | OK: Requires older TinyUSB version 0.18.0 (configure in devcontainer.json and rebuild container)  |
-| 21_resonator | OK |
-| 22_sheep | OK |
-| 25_utility_pair | separate repo |
-| 31_esp | missing CMakeLists.txt |
-| 32_vink | missing CMakeLists.txt |
-| 41_blackbird | OK |
-| 55_fifths | OK |
-| 69_trace | missing CMakeLists.txt |
-| 78_Talker | missing CMakeLists.txt |
+| Workshop_Computer/releases/03_Turing_Machine/Rev_1_5_Code | ✅ Success |
+| Workshop_Computer/releases/04_BYO_Benjolin | ✅ Success |
+| Workshop_Computer/releases/05_chord_blimey/src | ✅ Success |
+| Workshop_Computer/releases/06_usb_audio | ✅ Success (Requires TinyUSB 0.20.0 which is the default here) |
+| Workshop_Computer/releases/06_usb_audio/Rev1 | ✅ Success |
+| Workshop_Computer/releases/07_bumpers/src | ✅ Success |
+| Workshop_Computer/releases/10_twists/src | ✅ Success |
+| Workshop_Computer/releases/11_goldfish | ✅ Success |
+| Workshop_Computer/releases/12_am_coupler | ✅ Success |
+| Workshop_Computer/releases/14_cvmod | ✅ Success |
+| Workshop_Computer/releases/20_reverb | ⚠️ Requires TinyUSB 0.18.0 |
+| Workshop_Computer/releases/21_resonator | ✅ Success |
+| Workshop_Computer/releases/22_sheep | ✅ Success |
+| Workshop_Computer/releases/31_esp | ❌ Missing CMakeLists.txt |
+| Workshop_Computer/releases/32_vink | ❌ Missing CMakeLists.txt |
+| Workshop_Computer/releases/41_blackbird | ✅ Success |
+| Workshop_Computer/releases/55_fifths | ✅ Success |
+| Workshop_Computer/releases/69_trace/src | ❌ Missing CMakeLists.txt |
