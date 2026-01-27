@@ -18,11 +18,7 @@
       "runToEntryPoint": "main",
       "postAttachCommands": [
         "monitor reset init"
-      ],
-      "liveWatch": {
-        "enabled": true,
-        "samplesPerSecond": 4
-      }
+      ]
     }
   ]
 }

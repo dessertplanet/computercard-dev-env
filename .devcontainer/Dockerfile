@@ -1,7 +1,12 @@
 FROM mcr.microsoft.com/devcontainers/base:ubuntu-22.04
 
 ARG DEBIAN_FRONTEND=noninteractive
-ARG PICO_SDK_VERSION=2.0.0
+ARG PICO_SDK_VERSION
+
+RUN if [ -z "$PICO_SDK_VERSION" ]; then \
+        echo "PICO_SDK_VERSION is required. Set it in .devcontainer/devcontainer.json under build.args."; \
+        exit 1; \
+    fi
 
 RUN apt-get update \
     && apt-get install -y --no-install-recommends \

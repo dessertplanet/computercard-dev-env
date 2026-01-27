@@ -142,4 +142,6 @@ The devcontainer sets:
 - `PICO_SDK_PATH=/opt/pico-sdk`
 - `MAKEFILES=/workspaces/computercard-dev-env/scripts/pico_auto_make.mk`
 
+The Pico SDK version is selected at container build time in `.devcontainer/devcontainer.json` under `build.args.PICO_SDK_VERSION`.
+
 See `.devcontainer/devcontainer.json`.
