@@ -62,7 +62,7 @@ all:
 				statuses+=("❌ Failed (TinyUSB/Pico SDK version mismatch)"); \
 			elif [[ "$$tinyusb_hit" == "yes" ]]; then \
 				statuses+=("❌ Failed (TinyUSB version mismatch)"); \
-			elif [[ "$$picosdk_hit" == "yes" ]]; then \s
+			elif [[ "$$picosdk_hit" == "yes" ]]; then \
 				statuses+=("❌ Failed (Pico SDK version mismatch)"); \
 			else \
 				statuses+=("❌ Failed (Compile errors)"); \
