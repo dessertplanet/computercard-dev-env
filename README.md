@@ -134,7 +134,7 @@ Once installed, you can run the same actions via Command Palette (command/ctrl-s
 - Container won’t connect to OpenOCD: ensure OpenOCD is running on the host and you see `Info : Listening on port 3333 for gdb connections` in the OpenOCD output.
 - Flash/debug still failing: see [README-development.md](README-development.md) for variables like `OPENOCD_HOST`, `OPENOCD_GDB_PORT`, and `GDB`.
 
-### Released PicoSDK Card Build Status (2026-01-20)
+### Released PicoSDK Card Build Status (2026-01-27)
 
 Status is based on manual testing of all Pico SDK cards in the main repo using the `make` command in the folder containing the CMakeLists.txt for each project.
 
@@ -143,14 +143,20 @@ Status is based on manual testing of all Pico SDK cards in the main repo using t
 | 03_Turing_Machine/Rev_1_5_Code | OK |
 | 04_BYO_Benjolin | OK |
 | 05_chord_blimey/src | OK |
-| 06_usb_audio | OK |
+| 06_usb_audio/Rev1 | OK |
+| 06_usb_audio | new version does not build currently - custom TinyUSB fork? |
 | 07_bumpers/src | OK |
-| 10_twists/src | OK: Fixed in local submodule with one-liner `dc5351f` |
+| 10_twists/src | OK |
 | 11_goldfish | OK |
 | 12_am_coupler | OK |
 | 14_cvmod | OK |
 | 20_reverb | OK |
 | 21_resonator | OK |
 | 22_sheep | OK |
+| 25_utility_pair | separate repo |
+| 31_esp | missing CMakeLists.txt |
+| 32_vink | missing CMakeLists.txt |
 | 41_blackbird | OK |
 | 55_fifths | OK |
+| 69_trace | missing CMakeLists.txt |
+| 78_Talker | missing CMakeLists.txt |
