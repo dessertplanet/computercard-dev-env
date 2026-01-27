@@ -59,11 +59,11 @@ all:
 			tinyusb_hit=$$(grep -Eqi "tinyusb|\\btusb\\b" "$$log_file" && echo yes || echo no); \
 			picosdk_hit=$$(grep -Eqi "pico[- ]sdk|PICO_SDK" "$$log_file" && echo yes || echo no); \
 			if [[ "$$tinyusb_hit" == "yes" && "$$picosdk_hit" == "yes" ]]; then \
-				statuses+=("❌ Failed (TinyUSB/Pico SDK)"); \
+				statuses+=("❌ Failed (TinyUSB/Pico SDK version mismatch)"); \
 			elif [[ "$$tinyusb_hit" == "yes" ]]; then \
-				statuses+=("❌ Failed (TinyUSB)"); \
-			elif [[ "$$picosdk_hit" == "yes" ]]; then \
-				statuses+=("❌ Failed (Pico SDK)"); \
+				statuses+=("❌ Failed (TinyUSB version mismatch)"); \
+			elif [[ "$$picosdk_hit" == "yes" ]]; then \s
+				statuses+=("❌ Failed (Pico SDK version mismatch)"); \
 			else \
 				statuses+=("❌ Failed"); \
 			fi; \
