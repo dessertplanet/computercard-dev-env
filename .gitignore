@@ -1,2 +1,3 @@
 # Ignore build outputs anywhere
 **/build/
+*/.DS_Store
