@@ -7,8 +7,8 @@ Usage:
   vscode_task_make.sh <make-target> <start-dir>
 
 Examples:
-  vscode_task_make.sh build /workspaces/computercard-dev-env/Workshop_Computer/releases/22_sheep/src
-  vscode_task_make.sh flash /workspaces/computercard-dev-env/XX_newcard
+  vscode_task_make.sh build <workspace>/Workshop_Computer/releases/22_sheep/src
+  vscode_task_make.sh flash <workspace>/XX_newcard
 
 Behavior:
   Walks upward from <start-dir> to find the nearest directory containing CMakeLists.txt,
@@ -40,7 +40,10 @@ if command -v realpath >/dev/null 2>&1; then
 fi
 
 search_dir="${start_dir}"
-workspace_dir=${WORKSPACE_DIR:-"/workspaces/computercard-dev-env"}
+# Derive the repo root from this script's location so it is not tied to a
+# specific workspace folder name.
+script_dir=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
+workspace_dir=${WORKSPACE_DIR:-"$(dirname "${script_dir}")"}
 
 is_project_root() {
 	[[ -f "${1}/CMakeLists.txt" ]]

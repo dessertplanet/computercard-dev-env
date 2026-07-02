@@ -1,7 +1,9 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-ROOT_DIR="/workspaces/computercard-dev-env"
+# Resolve the repo root from this script's location so the bootstrap works
+# regardless of the workspace folder name or clone location.
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 SUBMODULE_PATH="Workshop_Computer"
 
 if ! git -C "$ROOT_DIR" rev-parse --is-inside-work-tree >/dev/null 2>&1; then

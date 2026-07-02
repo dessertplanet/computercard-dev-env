@@ -11,6 +11,12 @@
 
 SHELL := /bin/bash
 
+# Absolute path to this harness file and the dev-env repo root that contains it.
+# Captured here (rather than hardcoded) so the harness works regardless of the
+# workspace folder name or where the repo is cloned.
+PICO_AUTO_MAKE_MK := $(abspath $(lastword $(MAKEFILE_LIST)))
+DEV_ENV_ROOT := $(abspath $(dir $(PICO_AUTO_MAKE_MK))/..)
+
 # Only activate when there is NO local makefile in the current directory.
 LOCAL_MAKEFILE := $(firstword $(wildcard GNUmakefile Makefile makefile))
 ifeq ($(strip $(LOCAL_MAKEFILE)),)
@@ -56,7 +62,7 @@ CMAKE_CXX_STANDARD ?= 17
 # - Otherwise fall back to the SDK built under ComputerCard_Examples (if present).
 # - Otherwise allow FetchContent via Pico SDK's standard variables.
 PICO_SDK_PATH ?= $(if $(wildcard /opt/pico-sdk/pico_sdk_init.cmake),/opt/pico-sdk,)
-WORKSPACE_PICO_SDK ?= /workspaces/computercard-dev-env/ComputerCard_Examples/build/pico-sdk
+WORKSPACE_PICO_SDK ?= $(DEV_ENV_ROOT)/ComputerCard_Examples/build/pico-sdk
 ifneq ($(strip $(PICO_SDK_PATH)),)
   CMAKE_PICO_SDK_ARGS := -DPICO_SDK_PATH=$(PICO_SDK_PATH)
 else ifneq ($(wildcard $(WORKSPACE_PICO_SDK)/pico_sdk_init.cmake),)

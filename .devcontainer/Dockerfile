@@ -54,9 +54,9 @@ RUN if [ -n "$TINYUSB_VERSION" ]; then \
 # Make the SDK path available during the picotool build.
 ENV PICO_SDK_PATH=/opt/pico-sdk
 
-# Auto-include the dev-env Makefile helper so PicoSDK/CMake release folders
-# without a local Makefile can still be built by running `make`.
-ENV MAKEFILES=/workspaces/computercard-dev-env/scripts/pico_auto_make.mk
+# Note: the MAKEFILES auto-include (scripts/pico_auto_make.mk) is set via
+# devcontainer.json's remoteEnv using ${containerWorkspaceFolder}, so the path
+# adapts to the workspace folder name instead of being baked into the image.
 
 # Install picotool so the Pico SDK build doesn't need to fetch it.
 # Match the SDK version by default.
