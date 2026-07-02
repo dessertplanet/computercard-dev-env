@@ -13,12 +13,16 @@ Options:
   --target <cfg>        OpenOCD target cfg (default: target/rp2040.cfg)
   --speed <khz>         Adapter speed in kHz (default: 5000)
   --gdb-port <port>     GDB port (default: 3333)
+  --gdb-max <count>     Max GDB connections (default: 3)
+  --gdb-targets <names> OpenOCD target names for GDB max setting
+                        (default: "rp2040.core0 rp2040.core1")
   --telnet-port <port>  Telnet port (default: 4444)
   --tcl-port <port>     TCL port (default: 6666)
 
 Environment (equivalent defaults):
   OPENOCD_INTERFACE_CFG, OPENOCD_TARGET_CFG, OPENOCD_ADAPTER_SPEED,
-  OPENOCD_GDB_PORT, OPENOCD_TELNET_PORT, OPENOCD_TCL_PORT
+  OPENOCD_GDB_PORT, OPENOCD_GDB_MAX_CONNECTIONS, OPENOCD_GDB_TARGETS,
+  OPENOCD_TELNET_PORT, OPENOCD_TCL_PORT
 
 Examples:
   ./scripts/start_openocd_host.sh
@@ -39,6 +43,8 @@ interface_cfg="${OPENOCD_INTERFACE_CFG:-interface/cmsis-dap.cfg}"
 target_cfg="${OPENOCD_TARGET_CFG:-target/rp2040.cfg}"
 adapter_speed="${OPENOCD_ADAPTER_SPEED:-5000}"
 gdb_port="${OPENOCD_GDB_PORT:-3333}"
+gdb_max_connections="${OPENOCD_GDB_MAX_CONNECTIONS:-3}"
+gdb_targets="${OPENOCD_GDB_TARGETS:-rp2040.core0 rp2040.core1}"
 telnet_port="${OPENOCD_TELNET_PORT:-4444}"
 tcl_port="${OPENOCD_TCL_PORT:-6666}"
 
@@ -61,6 +67,12 @@ while [[ $# -gt 0 ]]; do
       ;;
     --gdb-port)
       gdb_port="$2"; shift 2
+      ;;
+    --gdb-max)
+      gdb_max_connections="$2"; shift 2
+      ;;
+    --gdb-targets)
+      gdb_targets="$2"; shift 2
       ;;
     --telnet-port)
       telnet_port="$2"; shift 2
@@ -85,14 +97,22 @@ echo "  interface:   $interface_cfg"
 echo "  target:      $target_cfg"
 echo "  speed (kHz): $adapter_speed"
 echo "  gdb_port:    $gdb_port"
+echo "  gdb_max:     $gdb_max_connections"
+echo "  gdb_targets: $gdb_targets"
 echo "  telnet_port: $telnet_port"
 echo "  tcl_port:    $tcl_port"
+
+gdb_max_args=()
+for target_name in $gdb_targets; do
+  gdb_max_args+=(-c "$target_name configure -gdb-max-connections $gdb_max_connections")
+done
 
 if [[ ${#extra_args[@]} -gt 0 ]]; then
   exec openocd \
     -f "$interface_cfg" \
     -f "$target_cfg" \
     -c "adapter speed $adapter_speed" \
+    "${gdb_max_args[@]}" \
     -c "gdb_port $gdb_port" \
     -c "telnet_port $telnet_port" \
     -c "tcl_port $tcl_port" \
@@ -102,6 +122,7 @@ else
     -f "$interface_cfg" \
     -f "$target_cfg" \
     -c "adapter speed $adapter_speed" \
+    "${gdb_max_args[@]}" \
     -c "gdb_port $gdb_port" \
     -c "telnet_port $telnet_port" \
     -c "tcl_port $tcl_port"

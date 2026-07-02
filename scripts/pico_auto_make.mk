@@ -72,7 +72,7 @@ else
 endif
 
 CMAKE_ARGS ?=
-PICO_BOARD_HEADER_DIRS ?= $(abspath $(PICO_PROJECT_DIR));$(abspath $(PICO_PROJECT_DIR)/..);/workspaces/computercard-dev-env/boards
+PICO_BOARD_HEADER_DIRS ?= $(abspath $(PICO_PROJECT_DIR));$(abspath $(PICO_PROJECT_DIR)/..)
 
 # Toolchain resolution:
 # - Respect PICO_TOOLCHAIN_PATH if already set.
