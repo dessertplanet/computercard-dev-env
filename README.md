@@ -1,3 +1,6 @@
+> [!WARNING]
+> This dev env is no longer maintained or updated, as it has been incorporated directly into https://github.com/TomWhitwell/Workshop_Computer 
+
 # ComputerCard Development Environment
 
 This repo helps you build, flash, and debug RP2040 “ComputerCard” firmware for the Music Thing Workshop System using the Pico SDK, with a VS Code Dev Container.
